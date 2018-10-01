@@ -6,7 +6,6 @@ import (
 	"net/http"
 	netURL "net/url"
 	"strconv"
-	"sync"
 	"time"
 )
 
@@ -34,56 +33,101 @@ func urlValidate(u *URLTest) {
 	}
 
 	/* Set Host and Port fields */
-	newURL, err := netURL.Parse(u.URL)
+	parsedURL, err := netURL.Parse(u.URL)
 	if err != nil {
 		panic(err)
 	}
 
-	host, port, _ := net.SplitHostPort(newURL.Hostname())
+	host, port, err := net.SplitHostPort(parsedURL.Hostname())
+	if err != nil {
+		host = parsedURL.Hostname()
+	}
 	u.Server = host
+
+	// Try to discovery the port
 	u.Port, _ = strconv.Atoi(port)
 
+	if u.Port == 0 {
+		u.Port, _ = strconv.Atoi(parsedURL.Port())
+	}
+
+	if u.Port == 0 {
+		if parsedURL.Scheme == "https" {
+			u.Port = 443
+		} else {
+			u.Port = 80
+		}
+	}
 }
 
 /* Setup URLs from config and call the start func */
-func urlTestSetup(config *URLConfig) {
+func urlTestLauncher() {
 
-	var wg sync.WaitGroup
 	timeTotalStart := time.Now()
-	chanResp := make(chan URLTestResult)
-	lenUrls := len(config.URLs)
 
-	wg.Add(lenUrls)
+	config.ChanResp = make(chan URLTestResult)
+	lenUrls := len(config.URLs)
+	config.WG.Add(lenUrls)
 
 	fmt.Printf("#> Found [%d] URLs to test, starting...\n", lenUrls)
 	for k := range config.URLs {
 
-		go urlTestStart(chanResp, &wg, config.URLs[k])
+		go urlTestSetup(&config.URLs[k])
 
 	}
 
 	/* Show all answers from the channel */
-	go func() {
-		for resp := range chanResp {
-			fmt.Println(resp.Message)
-		}
-	}()
+	for x := 0; x < lenUrls; x++ {
+		r := <-config.ChanResp
+		fmt.Println(r.Message)
+	}
 
 	/* Wait for all goroutines in a workgroup */
-	wg.Wait()
+	config.WG.Wait()
 
 	timeTotalTakenMs := int64(time.Since(timeTotalStart) / time.Millisecond)
 	fmt.Printf("Total time taken: %vms\n", timeTotalTakenMs)
 }
 
 /* GOroutines to execute the URL check */
-func urlTestStart(chanResp chan<- URLTestResult, wg *sync.WaitGroup, u URLTest) {
+func urlTestSetup(u *URLTest) {
 
-	defer wg.Done()
+	defer config.WG.Done()
 	var testResp URLTestResult
+	urlValidate(u)
 
+	if config.OptForceDNS {
+		var testGroup URLTestGroup
+		var testGroupResp URLTestResult
+		ips, _ := net.LookupIP(u.Server)
+		// if err != nil {
+		// }
+		for _, ip := range ips {
+			var uIP URLTest
+			uIP = *u
+			uIP.Server = uIP.Host
+			uIP.Server = ip.String()
+			testGroup.URLs = append(testGroup.URLs, uIP)
+		}
+		// testGroupResp.Message = fmt.Sprintf(" Len servers=%d", len(testGroup.URLs))
+
+		for i := 0; i < len(testGroup.URLs); i++ {
+			urlTestStart(u, &testGroupResp)
+			respStr := testGroupResp.Message
+			testResp.Message += fmt.Sprintf("%s\n", respStr)
+		}
+
+	} else {
+
+		urlTestStart(u, &testResp)
+
+	}
+
+	config.ChanResp <- testResp
+}
+
+func urlTestStart(u *URLTest, r *URLTestResult) {
 	// Check all fields was filled
-	urlValidate(&u)
 
 	timeout := time.Duration((time.Duration)(u.Timeout) * time.Second)
 	client := http.Client{
@@ -96,17 +140,16 @@ func urlTestStart(chanResp chan<- URLTestResult, wg *sync.WaitGroup, u URLTest) 
 
 	if err != nil {
 
-		testResp.Body = err.Error()
-		testResp.Status = "FAIL"
+		r.Body = fmt.Sprintf("\n\t %s", err.Error())
+		r.Status = "FAIL"
 		// url_alert(u, &resp_url)
 
 	} else {
 
-		testResp.Status = "OK"
-		testResp.Body = fmt.Sprintf("[%s] [%v ms]", resp.Status, int64(timeTaken/time.Millisecond))
+		r.Status = "OK"
+		r.Body = fmt.Sprintf("[%s] [%v ms]", resp.Status, int64(timeTaken/time.Millisecond))
 		// url_alert_close(u, resp_url)
 
 	}
-	testResp.Message = fmt.Sprintf("[%4s] URL=[%50s] : %s", testResp.Status, u.URL, testResp.Body)
-	chanResp <- testResp
+	r.Message = fmt.Sprintf("URL=[%50s] [%4s] : %s", u.URL, r.Status, r.Body)
 }

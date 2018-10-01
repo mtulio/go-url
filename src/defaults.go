@@ -1,18 +1,10 @@
 package main
 
 var (
-	/* Globals */
-	config URLConfig
+	config GlobalConfig
 
+	/* Globals */
 	defaultTimeout = 5
 	defaultSchema  = "http"
 	defaultURLPath = "/"
-
-	/* Input options */
-	configFile *string
 )
-
-/* Initialize */
-func init() {
-	/* Envs */
-}

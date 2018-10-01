@@ -9,10 +9,10 @@ import (
 
 /* JSON File */
 // Sample: {"urls": [{"url": "http://www.google.com"}]}
-func configParserFromFile(c *URLConfig, filename *string) {
+func configParserFromFile() {
 
 	/* Read Config */
-	filePath := string(*filename)
+	filePath := config.OptConfFile
 	file, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		fmt.Printf("> error while reading file %s\n", filePath)
@@ -20,7 +20,7 @@ func configParserFromFile(c *URLConfig, filename *string) {
 		os.Exit(1)
 	}
 
-	err = json.Unmarshal(file, c)
+	err = json.Unmarshal(file, &config)
 	if err != nil {
 		fmt.Println("error:", err)
 		os.Exit(1)

@@ -1,0 +1,19 @@
+{
+  "urls":
+  [
+    {
+      "url": "http://grafana.internal:3000/"
+    },
+    {
+      "proto": "http",
+      "server": "prometheus.internal",
+      "port": 9090,
+      "path": "/metrics",
+      "timeout": 5
+    },
+    {
+      "url": "https://www.google.com/"
+    }
+  ]
+}
+
