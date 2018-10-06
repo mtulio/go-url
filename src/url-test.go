@@ -27,6 +27,10 @@ func urlValidate(u *URLTest) {
 			u.Port, u.Path)
 	}
 
+	if u.Method == "" {
+		u.Method = "GET"
+	}
+
 	/* Set timeout */
 	if u.Timeout <= 0 {
 		u.Timeout = int(defaultTimeout)
@@ -142,9 +146,10 @@ func urlTestStart(u *URLTest, r *URLTestResult) {
 	client := http.Client{
 		Timeout: timeout,
 	}
+	req, err := http.NewRequest(u.Method, u.URL, nil)
 
 	timeStart := time.Now()
-	resp, err := client.Get(u.URL)
+	resp, err := client.Do(req)
 	timeTaken := time.Since(timeStart)
 
 	if err != nil {

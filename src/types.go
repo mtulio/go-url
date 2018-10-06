@@ -22,8 +22,11 @@ type URLTest struct {
 	Port    int    `json:"port"`
 	Path    string `json:"path"`
 	Timeout int    `json:"timeout"`
+	Method  string `json:"method"`
 }
 
+// URLTestGroup is a group of URLTest used when
+// -dns is enabled, to split one test case in groups.
 type URLTestGroup struct {
 	URLs []URLTest
 }
