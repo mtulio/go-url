@@ -51,6 +51,10 @@ func urlValidate(u *URLTest) {
 		u.Port, _ = strconv.Atoi(parsedURL.Port())
 	}
 
+	if u.Proto == "" {
+		u.Proto = parsedURL.Scheme
+	}
+
 	if u.Port == 0 {
 		if parsedURL.Scheme == "https" {
 			u.Port = 443
@@ -99,22 +103,27 @@ func urlTestSetup(u *URLTest) {
 	if config.OptForceDNS {
 		var testGroup URLTestGroup
 		var testGroupResp URLTestResult
-		ips, _ := net.LookupIP(u.Server)
-		// if err != nil {
-		// }
+
+		ips, err := net.LookupIP(u.Server)
+		if err != nil {
+			testResp.Message += fmt.Sprintf("URL=[%50s]: [%4s] : DNS Err: %s", u.URL, "FAIL", err)
+		}
 		for _, ip := range ips {
 			var uIP URLTest
 			uIP = *u
-			uIP.Server = uIP.Host
+			uIP.Host = uIP.Server
 			uIP.Server = ip.String()
+			uIP.URL = fmt.Sprintf("%s://%s:%d%s",
+				u.Proto, uIP.Server,
+				u.Port, u.Path)
 			testGroup.URLs = append(testGroup.URLs, uIP)
 		}
 		// testGroupResp.Message = fmt.Sprintf(" Len servers=%d", len(testGroup.URLs))
 
-		for i := 0; i < len(testGroup.URLs); i++ {
-			urlTestStart(u, &testGroupResp)
+		for _, uIP := range testGroup.URLs {
+			urlTestStart(&uIP, &testGroupResp)
 			respStr := testGroupResp.Message
-			testResp.Message += fmt.Sprintf("%s\n", respStr)
+			testResp.Message += fmt.Sprintf("\n%s", respStr)
 		}
 
 	} else {
