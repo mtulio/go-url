@@ -40,5 +40,5 @@ tag:
 	git push origin $(version)
 
 release:
-	gorelease
+	goreleaser --rm-dist
 
