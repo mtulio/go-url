@@ -12,8 +12,8 @@
 *.out
 
 # artifacts
-!src/config-sample.json
-src/config*.json
+!hack/config-sample.json
+hack/config*.json
 
 # Go dep
 Gopkg.lock
