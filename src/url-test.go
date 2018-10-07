@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
@@ -29,6 +30,18 @@ func urlValidate(u *URLTest) {
 
 	if u.Method == "" {
 		u.Method = "GET"
+	}
+
+	if u.Gzip == "" {
+		u.Gzip = "no"
+	}
+
+	// Transport parameter
+	if u.TrSSLSkip == "" {
+		u.TrSSLSkip = "no"
+	}
+	if u.TrIpv6 == "" {
+		u.TrIpv6 = "no"
 	}
 
 	/* Set timeout */
@@ -64,6 +77,15 @@ func urlValidate(u *URLTest) {
 			u.Port = 443
 		} else {
 			u.Port = 80
+		}
+	}
+
+	// Fill the path
+	if u.Path == "" {
+		if parsedURL.Path == "" {
+			u.Path = "/"
+		} else {
+			u.Path = parsedURL.Path
 		}
 	}
 }
@@ -107,19 +129,30 @@ func urlTestSetup(u *URLTest) {
 	if config.OptForceDNS {
 		var testGroup URLTestGroup
 		var testGroupResp URLTestResult
-
+		timeStart := time.Now()
 		ips, err := net.LookupIP(u.Server)
+		timeTaken := time.Since(timeStart)
 		if err != nil {
-			testResp.Message += fmt.Sprintf("URL=[%50s]: [%4s] : DNS Err: %s", u.URL, "FAIL", err)
+			testResp.Message += fmt.Sprintf(
+				"URL=[%50s]: [%4s] - DNS [%v ms] Err: %s",
+				u.URL, "FAIL",
+				int64(timeTaken/time.Millisecond),
+				err)
 		}
 		for _, ip := range ips {
 			var uIP URLTest
 			uIP = *u
 			uIP.Host = uIP.Server
 			uIP.Server = ip.String()
+			uIP.TrSSLSkip = "yes"
+			if ip.To4() == nil {
+				uIP.TrIpv6 = "yes"
+				uIP.Server = fmt.Sprintf("[%s]", uIP.Server)
+			}
 			uIP.URL = fmt.Sprintf("%s://%s:%d%s",
 				u.Proto, uIP.Server,
 				u.Port, u.Path)
+
 			testGroup.URLs = append(testGroup.URLs, uIP)
 		}
 		// testGroupResp.Message = fmt.Sprintf(" Len servers=%d", len(testGroup.URLs))
@@ -127,7 +160,8 @@ func urlTestSetup(u *URLTest) {
 		for _, uIP := range testGroup.URLs {
 			urlTestStart(&uIP, &testGroupResp)
 			respStr := testGroupResp.Message
-			testResp.Message += fmt.Sprintf("\n%s", respStr)
+			testResp.Message += fmt.Sprintf("\n%s [DNS %v ms]",
+				respStr, int64(timeTaken/time.Millisecond))
 		}
 
 	} else {
@@ -140,13 +174,29 @@ func urlTestSetup(u *URLTest) {
 }
 
 func urlTestStart(u *URLTest, r *URLTestResult) {
-	// Check all fields was filled
 
+	// Setup transport Layer
+	httpTr := &http.Transport{}
 	timeout := time.Duration((time.Duration)(u.Timeout) * time.Second)
-	client := http.Client{
-		Timeout: timeout,
+	if u.TrSSLSkip == "yes" {
+		httpTr.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
+	if u.TrIpv6 == "yes" {
+		httpTr.Dial = (&net.Dialer{DualStack: true}).Dial
+	}
+	client := http.Client{
+		Timeout:   timeout,
+		Transport: httpTr,
+	}
+
+	// Setup HTTP request
 	req, err := http.NewRequest(u.Method, u.URL, nil)
+	if u.Host != "" {
+		req.Host = u.Host
+	}
+	if u.Gzip == "yes" {
+		req.Header.Add("Content-type", "application/gzip")
+	}
 
 	timeStart := time.Now()
 	resp, err := client.Do(req)
@@ -161,9 +211,17 @@ func urlTestStart(u *URLTest, r *URLTestResult) {
 	} else {
 
 		r.Status = "OK"
-		r.Body = fmt.Sprintf("[%s] [%v ms]", resp.Status, int64(timeTaken/time.Millisecond))
+		r.Body = fmt.Sprintf("[%s] [%v ms]",
+			resp.Status, int64(timeTaken/time.Millisecond))
 		// url_alert_close(u, resp_url)
 
 	}
-	r.Message = fmt.Sprintf("URL=[%50s] [%4s] : %s", u.URL, r.Status, r.Body)
+	if config.OptForceDNS {
+		testName := fmt.Sprintf("(%.30s) %29s", u.Host, u.URL)
+		r.Message = fmt.Sprintf("URL=[%60s] [%4s] : %s",
+			testName, r.Status, r.Body)
+	} else {
+		r.Message = fmt.Sprintf("URL=[%50s] [%4s] : %s", u.URL, r.Status, r.Body)
+	}
+
 }

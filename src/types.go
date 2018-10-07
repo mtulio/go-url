@@ -15,14 +15,17 @@ type GlobalConfig struct {
 
 // URLTest is a test definition
 type URLTest struct {
-	URL     string `json:"url"`
-	Proto   string `json:"proto"`
-	Server  string `json:"server"`
-	Host    string `json:"host"`
-	Port    int    `json:"port"`
-	Path    string `json:"path"`
-	Timeout int    `json:"timeout"`
-	Method  string `json:"method"`
+	URL       string `json:"url"`
+	Proto     string `json:"proto"`
+	Server    string `json:"server"`
+	Host      string `json:"host"`
+	Port      int    `json:"port"`
+	Path      string `json:"path"`
+	Timeout   int    `json:"timeout"`
+	Method    string `json:"method"`
+	Gzip      string `json:"gzip"`
+	TrSSLSkip string `json:"ssl_skip"`
+	TrIpv6    string `json:"ipv6"`
 }
 
 // URLTestGroup is a group of URLTest used when
