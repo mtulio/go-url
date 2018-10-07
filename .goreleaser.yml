@@ -1,5 +1,4 @@
-# This is an example goreleaser.yaml file with some sane defaults.
-# Make sure to check the documentation at http://goreleaser.com
+# GgoReleaser configuration.
 builds:
 - env:
   - CGO_ENABLED=0
@@ -20,3 +19,17 @@ changelog:
     exclude:
     - '^docs:'
     - '^test:'
+nfpm:
+  name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+  homepage:  https://github.com/mtulio/go-url
+  description: Make URL tests for each endpoint served by endpoint
+  maintainer: Marco Tulio R Braga <root@mtulio.eng.br>
+  license: Apache-2
+  vendor: Go-url
+  formats:
+  - deb
+  - rpm
+  dependencies:
+  - git
+  recommends:
+  - rpm
