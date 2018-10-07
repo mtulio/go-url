@@ -13,7 +13,7 @@
 
 # artifacts
 !src/config-sample.json
-src/conifg*.json
+src/config*.json
 
 # Go dep
 Gopkg.lock
