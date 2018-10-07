@@ -6,13 +6,16 @@
     },
     {
       "proto": "http",
-      "server": "prometheus.internal",
-      "port": 9090,
-      "path": "/metrics",
+      "server": "ifconfig.co",
+      "port": 80,
+      "path": "/json",
       "timeout": 5
     },
     {
       "url": "https://www.google.com/"
+    },
+    {
+      "url": "http://www.google.com/"
     }
   ]
 }
