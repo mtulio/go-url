@@ -41,5 +41,7 @@ endef
 
 # Ensure directories are removed
 define deps_clean
-	@rm rf -p $(BASE_DIRS)
+	@for d in $(BASE_DIRS); do \
+		rm -rvf $$d; \
+	done
 endef

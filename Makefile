@@ -9,6 +9,9 @@ build:
 	$(call deps_dirs)
 	go build -o bin/go-url *.go
 
+clean:
+	$(call deps_clean)
+
 # ##########
 # Goreleaser
 # https://goreleaser.com/introduction/
