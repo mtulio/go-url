@@ -7,7 +7,10 @@ include Makefile-ext.mk
 # Build
 build:
 	$(call deps_dirs)
-	go build -o bin/go-url src/*.go
+	go build -o bin/go-url *.go
+
+clean:
+	$(call deps_clean)
 
 # ##########
 # Goreleaser
@@ -37,5 +40,5 @@ tag:
 	git push origin $(version)
 
 release:
-	gorelease
+	goreleaser --rm-dist
 
