@@ -1,9 +1,13 @@
 
 # go-url Makefile
 
-CPWD := $(PWD)
-
 include Makefile-ext.mk
+
+# #####
+# Build
+build:
+	$(call deps_dirs)
+	go build -o bin/go-url src/*.go
 
 # ##########
 # Goreleaser

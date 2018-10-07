@@ -18,3 +18,7 @@ src/config*.json
 # Go dep
 Gopkg.lock
 Gopkg.toml
+
+# misc
+bin/
+dist/

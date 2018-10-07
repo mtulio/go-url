@@ -4,6 +4,11 @@
 # ###########
 # Global Vars
 
+CPWD := $(PWD)
+
+BASE_DIRS := ./bin
+BASE_DIRS += ./dist
+
 GORELEASE_VERSION := v0.86.1
 GORELEASE_BASE_URL := https://github.com/goreleaser/goreleaser/releases/download/$(GORELEASE_VERSION)/goreleaser
 GORELEASE_URL_RPM := $(GORELEASE_BASE_URL)_amd64.rpm
@@ -27,4 +32,14 @@ define deps_tag
 		$(call show_usage) \
 		exit 1; \
 	fi
+endef
+
+# Ensure directories exists
+define deps_dirs
+	@mkdir -p $(BASE_DIRS)
+endef
+
+# Ensure directories are removed
+define deps_clean
+	@rm rf -p $(BASE_DIRS)
 endef
