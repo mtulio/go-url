@@ -62,6 +62,45 @@ Total time taken: 5251ms
 
 ``` 
 
+* read url from arg `-url`
+
+```bash
+$ ./bin/go-url -url https://www.google.com
+#> Reading config from Param
+#> Found [1] URLs to test, starting...
+URL=[                            https://www.google.com] [  OK] : [200 OK] [952 ms]
+Total time taken: 953ms
+
+$ ./bin/go-url -url https://www.google.com -dns
+#> Reading config from Param
+#> Found [1] URLs to test, starting...
+
+URL=[    (www.google.com) https://[2607:f8b0:4008:811::2004]:443/] [  OK] : [200 OK] [962 ms] [DNS 106 ms]
+URL=[              (www.google.com)   https://172.217.29.132:443/] [  OK] : [200 OK] [377 ms] [DNS 106 ms]
+Total time taken: 1446ms
+
+
+```
+
+
+* read url from arg `argv[1]`
+
+```bash
+$ ./bin/go-url https://www.google.com
+#> Reading config from Param
+#> Found [1] URLs to test, starting...
+URL=[                            https://www.google.com] [  OK] : [200 OK] [942 ms]
+Total time taken: 942ms
+
+$ ./bin/go-url -dns https://www.google.com
+#> Reading config from Param
+#> Found [1] URLs to test, starting...
+
+URL=[    (www.google.com) https://[2607:f8b0:4008:811::2004]:443/] [  OK] : [200 OK] [1870 ms] [DNS 113 ms]
+URL=[              (www.google.com)    https://172.217.30.68:443/] [  OK] : [200 OK] [236 ms] [DNS 113 ms]
+
+```
+
 ## Contributing
 
 <TODO>

@@ -11,6 +11,8 @@ type GlobalConfig struct {
 	WG          sync.WaitGroup
 	OptForceDNS bool
 	OptConfFile string
+	OptURL      string
+	OptEmpty    bool
 }
 
 // URLTest is a test definition

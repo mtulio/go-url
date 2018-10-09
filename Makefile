@@ -9,6 +9,9 @@ build:
 	$(call deps_dirs)
 	go build -o bin/go-url *.go
 
+run:
+	go run *.go -url=http://www.google.com
+
 clean:
 	$(call deps_clean)
 
