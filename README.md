@@ -101,6 +101,39 @@ URL=[              (www.google.com)    https://172.217.30.68:443/] [  OK] : [200
 
 ```
 
+* using docker
+
+```bash
+ $ docker run -v $PWD/hack/config-sample.json:/config.json -i mtulio/go-url:docker -dns -config /config.json 
+#> Reading config from JSON file: /config.json
+#> Found [4] URLs to test, starting...
+URL=[                     http://grafana.internal:3000/]: [FAIL] - DNS [14 ms] Err: lookup grafana.internal on 181.213.132.2:53: no such host
+
+URL=[              (www.google.com)     http://172.217.29.132:80/] [  OK] : [200 OK] [132 ms] [DNS 14 ms]
+URL=[       (www.google.com) http://[2800:3f0:4001:805::2004]:80/] [FAIL] : 
+	 Get http://[2800:3f0:4001:805::2004]:80/: dial tcp [2800:3f0:4001:805::2004]:80: connect: cannot assign requested address [DNS 14 ms]
+
+URL=[              (www.google.com)   https://172.217.29.132:443/] [  OK] : [200 OK] [230 ms] [DNS 14 ms]
+URL=[     (www.google.com) https://[2800:3f0:4001:805::2004]:443/] [FAIL] : 
+	 Get https://[2800:3f0:4001:805::2004]:443/: dial tcp [2800:3f0:4001:805::2004]:443: connect: cannot assign requested address [DNS 14 ms]
+
+URL=[                 (ifconfig.co)  http://104.27.143.41:80/json] [  OK] : [200 OK] [1115 ms] [DNS 308 ms]
+URL=[                 (ifconfig.co)  http://104.27.142.41:80/json] [  OK] : [200 OK] [549 ms] [DNS 308 ms]
+URL=[      (ifconfig.co) http://[2606:4700:30::681b:8e29]:80/json] [FAIL] : 
+	 Get http://[2606:4700:30::681b:8e29]:80/json: dial tcp [2606:4700:30::681b:8e29]:80: connect: cannot assign requested address [DNS 308 ms]
+URL=[      (ifconfig.co) http://[2606:4700:30::681b:8f29]:80/json] [FAIL] : 
+	 Get http://[2606:4700:30::681b:8f29]:80/json: dial tcp [2606:4700:30::681b:8f29]:80: connect: cannot assign requested address [DNS 308 ms]
+Total time taken: 1975ms
+
+$ docker run -v $PWD/hack/config-sample.json:/config.json -i mtulio/go-url:docker https://g1.globo.com 
+#> Reading config from Param
+#> Found [1] URLs to test, starting...
+URL=[                              https://g1.globo.com] [  OK] : [200 OK] [192 ms]
+Total time taken: 193ms
+
+
+```
+
 ## Contributing
 
 <TODO>

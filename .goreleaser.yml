@@ -33,3 +33,11 @@ nfpm:
   - git
   recommends:
   - rpm
+dockers:
+- image: mtulio/go-url
+  extra_files:
+  - scripts/docker-entrypoing.sh
+  tag_templates:
+  - '{{ .Tag }}'
+  - 'v{{ .Major }}.{{ .Minor }}'
+  - 'latest'

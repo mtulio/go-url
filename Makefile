@@ -1,7 +1,7 @@
 
 # go-url Makefile
 
-include Makefile-ext.mk
+include Makefile-defines.mk
 
 # #####
 # Build
@@ -35,13 +35,27 @@ gorelease-init:
 
 # #######
 # Release
-# https://goreleaser.com/introduction/
-
 tag:
 	$(call deps_tag,$@)
 	git tag -a $(version) -m "$(message)"
 	git push origin $(version)
 
+# Release tool
+# https://goreleaser.com/introduction/
 release:
 	goreleaser --rm-dist
 
+# ######
+# Docker
+
+.PHONY: docker-build
+docker-build:
+	docker build -t "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)" .
+
+.PHONY: docker-push
+docker-push:
+	docker push "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME)"
+
+.PHONY: docker-tag-latest
+docker-tag-latest:
+	docker tag "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)" "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):latest"
