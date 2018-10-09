@@ -33,11 +33,17 @@ nfpm:
   - git
   recommends:
   - rpm
+
+  # https://goreleaser.com/customization/#Docker
 dockers:
-- image: mtulio/go-url
-  extra_files:
-  - scripts/docker-entrypoing.sh
+- binary: go-url
+  image: mtulio/go-url
+  goos: linux
+  goarch: amd64
+  skip_push: false
+  dockerfile: hack/Dockerfile-goreleaser
   tag_templates:
-  - '{{ .Tag }}'
-  - 'v{{ .Major }}.{{ .Minor }}'
-  - 'latest'
+    - "{{ .Tag }}"
+    - "v{{ .Major }}"
+    - "v{{ .Major }}.{{ .Minor }}"
+    - latest

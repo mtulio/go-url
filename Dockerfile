@@ -10,7 +10,7 @@ FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 WORKDIR /go
 COPY --from=0 /build/bin/go-url /go/go-url
-ADD scripts/docker-entrypoint.sh /go/entrypoint.sh
+ADD hack/docker-entrypoint.sh /go/entrypoint.sh
 RUN chmod +x /go/entrypoint.sh
 ENTRYPOINT ["sh","/go/entrypoint.sh"]
 CMD [ "-h" ]
