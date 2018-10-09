@@ -4,14 +4,20 @@
 # ###########
 # Global Vars
 
+APP_NAME ?= go-url
+
+DOCKER_REPO 		?= mtulio
+DOCKER_IMAGE_NAME 	= $(APP_NAME)
+DOCKER_IMAGE_TAG 	?= $(subst /,-,$(shell git rev-parse --abbrev-ref HEAD))
+
 CPWD := $(PWD)
 
-BASE_DIRS := ./bin
-BASE_DIRS += ./dist
+TMP_DIRS := ./bin
+TMP_DIRS += ./dist
 
-GORELEASE_VERSION := v0.86.1
-GORELEASE_BASE_URL := https://github.com/goreleaser/goreleaser/releases/download/$(GORELEASE_VERSION)/goreleaser
-GORELEASE_URL_RPM := $(GORELEASE_BASE_URL)_amd64.rpm
+GORELEASE_VERSION 	:= v0.86.1
+GORELEASE_BASE_URL 	:= https://github.com/goreleaser/goreleaser/releases/download/$(GORELEASE_VERSION)/goreleaser
+GORELEASE_URL_RPM 	:= $(GORELEASE_BASE_URL)_amd64.rpm
 
 # ##################
 # Makefile functions
@@ -36,12 +42,12 @@ endef
 
 # Ensure directories exists
 define deps_dirs
-	@mkdir -p $(BASE_DIRS)
+	@mkdir -p $(TEMP_DIRS)
 endef
 
 # Ensure directories are removed
 define deps_clean
-	@for d in $(BASE_DIRS); do \
+	@for d in $(TEMP_DIRS); do \
 		rm -rvf $$d; \
 	done
 endef

@@ -1,0 +1,4 @@
+FROM alpine:latest
+COPY go-url /go-url
+ENTRYPOINT ["/go-url"]
+CMD [ "-h" ]
