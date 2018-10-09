@@ -26,3 +26,9 @@ func configParserFromFile() {
 		os.Exit(1)
 	}
 }
+
+func configParserFromParam() {
+	var u URLTest
+	u.URL = config.OptURL
+	config.URLs = append(config.URLs, u)
+}
