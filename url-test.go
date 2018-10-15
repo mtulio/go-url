@@ -110,6 +110,7 @@ func urlTestLauncher() {
 	for x := 0; x < lenUrls; x++ {
 		r := <-config.ChanResp
 		fmt.Println(r.Message)
+		sendMetrics(r.Metrics)
 	}
 
 	/* Wait for all goroutines in a workgroup */
@@ -132,6 +133,7 @@ func urlTestSetup(u *URLTest) {
 		timeStart := time.Now()
 		ips, err := net.LookupIP(u.Server)
 		timeTaken := time.Since(timeStart)
+		testGroupResp.DNSTimeTaken = int64(timeTaken / time.Millisecond)
 		if err != nil {
 			testResp.Message += fmt.Sprintf(
 				"URL=[%50s]: [%4s] - DNS [%v ms] Err: %s",
@@ -159,10 +161,11 @@ func urlTestSetup(u *URLTest) {
 
 		for _, uIP := range testGroup.URLs {
 			urlTestStart(&uIP, &testGroupResp)
-			respStr := testGroupResp.Message
 			testResp.Message += fmt.Sprintf("\n%s [DNS %v ms]",
-				respStr, int64(timeTaken/time.Millisecond))
+				testGroupResp.Message, testGroupResp.DNSTimeTaken)
+
 		}
+		testResp.Metrics = testGroupResp.Metrics
 
 	} else {
 
@@ -202,6 +205,8 @@ func urlTestStart(u *URLTest, r *URLTestResult) {
 	resp, err := client.Do(req)
 	timeTaken := time.Since(timeStart)
 
+	var metric Metric
+
 	if err != nil {
 
 		r.Body = fmt.Sprintf("\n\t %s", err.Error())
@@ -211,11 +216,15 @@ func urlTestStart(u *URLTest, r *URLTestResult) {
 	} else {
 
 		r.Status = "OK"
+		metric.HTTPCode = resp.Status
+		metric.HTTPTimeTaken = int64(timeTaken / time.Millisecond)
 		r.Body = fmt.Sprintf("[%s] [%v ms]",
-			resp.Status, int64(timeTaken/time.Millisecond))
+			metric.HTTPCode, metric.HTTPTimeTaken)
 		// url_alert_close(u, resp_url)
 
 	}
+	metric.HTTPHost = u.Host
+	metric.HTTPServer = u.Server
 	if config.OptForceDNS {
 		testName := fmt.Sprintf("(%.30s) %29s", u.Host, u.URL)
 		r.Message = fmt.Sprintf("URL=[%60s] [%4s] : %s",
@@ -223,5 +232,6 @@ func urlTestStart(u *URLTest, r *URLTestResult) {
 	} else {
 		r.Message = fmt.Sprintf("URL=[%50s] [%4s] : %s", u.URL, r.Status, r.Body)
 	}
-
+	metric.DNSTimeTaken = r.DNSTimeTaken
+	r.Metrics = append(r.Metrics, metric)
 }

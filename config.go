@@ -25,10 +25,21 @@ func configParserFromFile() {
 		fmt.Println("error:", err)
 		os.Exit(1)
 	}
+	assertConfig()
 }
 
 func configParserFromParam() {
 	var u URLTest
 	u.URL = config.OptURL
 	config.URLs = append(config.URLs, u)
+	assertConfig()
+}
+
+func assertConfig() {
+	if config.Location == "" {
+		config.Location = os.Getenv("HOSTNAME")
+	}
+	if config.MetricPush == "" {
+		config.MetricPush = "http://localhost:9091"
+	}
 }
