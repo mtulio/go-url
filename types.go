@@ -7,6 +7,8 @@ import (
 // GlobalConfig is a main list of tests to go
 type GlobalConfig struct {
 	URLs        []URLTest `json:"urls"`
+	Location    string    `json:"location"`
+	MetricPush  string    `json:"metric_push"`
 	ChanResp    chan URLTestResult
 	WG          sync.WaitGroup
 	OptForceDNS bool
@@ -38,7 +40,18 @@ type URLTestGroup struct {
 
 // URLTestResult is a result struct for the tests
 type URLTestResult struct {
-	Message string
-	Status  string
-	Body    string
+	Message      string
+	Status       string
+	Body         string
+	DNSTimeTaken int64
+	Metrics      []Metric
+}
+
+// Metric is a results
+type Metric struct {
+	HTTPCode      string
+	HTTPTimeTaken int64
+	HTTPHost      string
+	HTTPServer    string
+	DNSTimeTaken  int64
 }

@@ -1,4 +1,6 @@
 {
+  "location": "us-east1-aws",
+  "metric_push": "http://localhost:9091",
   "urls":
   [
     {
