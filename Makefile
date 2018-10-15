@@ -9,8 +9,8 @@ build:
 	$(call deps_dirs)
 	go build -o bin/go-url *.go
 
-run:
-	go run *.go -url=http://www.google.com
+run-sample:
+	go run *.go -dns -url=http://www.google.com
 
 clean:
 	$(call deps_clean)
@@ -48,6 +48,13 @@ release:
 # ######
 # Docker
 
+.PHONY: docker-run-sample
+docker-run-sample:
+	docker run -i \
+		-v $(PWD)/hack/config-sample.json:/config-sample.json \
+		"$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)" \
+		-dns -config /config-sample.json
+
 .PHONY: docker-build
 docker-build:
 	docker build -t "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)" .
@@ -58,4 +65,13 @@ docker-push:
 
 .PHONY: docker-tag-latest
 docker-tag-latest:
-	docker tag "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)" "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):latest"
+	docker tag \
+		"$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)"
+		"$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):latest"
+
+# ####
+# Test
+
+.PHONY: test-run-metrics-stack
+test-run-metrics-stack:
+	cd hack && docker-compose up -d
