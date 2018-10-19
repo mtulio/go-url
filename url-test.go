@@ -7,6 +7,7 @@ import (
 	"net/http"
 	netURL "net/url"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -131,11 +132,10 @@ func urlTestSetup(u *URLTest) {
 
 	if config.OptForceDNS {
 		var testGroup URLTestGroup
-		var testGroupResp URLTestResult
 		timeStart := time.Now()
 		ips, err := net.LookupIP(u.Server)
 		timeTaken := time.Since(timeStart)
-		testGroupResp.DNSTimeTaken = int64(timeTaken / time.Millisecond)
+		dnsTimeTaken := int64(timeTaken / time.Millisecond)
 		if err != nil {
 			testResp.Message += fmt.Sprintf(
 				"URL=[%50s]: [%4s] - DNS [%v ms] Err: %s",
@@ -159,15 +159,33 @@ func urlTestSetup(u *URLTest) {
 
 			testGroup.URLs = append(testGroup.URLs, uIP)
 		}
-		// testGroupResp.Message = fmt.Sprintf(" Len servers=%d", len(testGroup.URLs))
 
-		for _, uIP := range testGroup.URLs {
-			urlTestStart(&uIP, &testGroupResp)
-			testResp.Message += fmt.Sprintf("\n%s [DNS %v ms]",
-				testGroupResp.Message, testGroupResp.DNSTimeTaken)
+		// paralel test URLs for each IP
+		uipResp := make(chan URLTestResult)
+		var wg sync.WaitGroup
+		wg.Add(len(testGroup.URLs))
 
+		for i := range testGroup.URLs {
+			go func(uIP URLTest) {
+				defer wg.Done()
+				var testGroupResp URLTestResult
+				testGroupResp.DNSTimeTaken = dnsTimeTaken
+
+				urlTestStart(&uIP, &testGroupResp)
+				uipResp <- testGroupResp
+
+			}(testGroup.URLs[i])
 		}
-		testResp.Metrics = testGroupResp.Metrics
+
+		for i := 0; i < len(testGroup.URLs); i++ {
+			resp := <-uipResp
+			testResp.Message += fmt.Sprintf("\n%s [DNS %v ms]",
+				resp.Message, resp.DNSTimeTaken)
+			for i := range resp.Metrics {
+				testResp.Metrics = append(testResp.Metrics, resp.Metrics[i])
+			}
+		}
+		wg.Wait()
 
 	} else {
 
@@ -203,11 +221,10 @@ func urlTestStart(u *URLTest, r *URLTestResult) {
 		req.Header.Add("Content-type", "application/gzip")
 	}
 
+	var metric Metric
 	timeStart := time.Now()
 	resp, err := client.Do(req)
 	timeTaken := time.Since(timeStart)
-
-	var metric Metric
 
 	if err != nil {
 
