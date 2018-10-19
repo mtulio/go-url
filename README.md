@@ -131,10 +131,32 @@ $ docker run -v $PWD/hack/config-sample.json:/config.json -i mtulio/go-url:docke
 URL=[                              https://g1.globo.com] [  OK] : [200 OK] [192 ms]
 Total time taken: 193ms
 
+```
+
+### Metrics
+
+* create local metrics stack (Prometheus + Pushgateway)
+
+`make test-run-metrics-stack`
+
+* send metrics to pushgateway using opt `-metric`
+
+```bash
+HOSTNAME=MyNode go run *.go -dns -url=http://www.google.com -metric=http://localhost:9091
+#> Reading config from Param
+#> Found [1] URLs to test, starting...
+
+URL=[      (www.google.com) http://[2607:f8b0:4004:80b::2004]:80/] [  OK] : [200 OK] [353 ms] [DNS 160 ms]
+URL=[              (www.google.com)      http://172.217.7.228:80/] [  OK] : [200 OK] [341 ms] [DNS 160 ms]
+Total time taken: 858ms
 
 ```
 
+* look at the metric on the Pushgateway
+
+![screenshot from 2018-10-19 02-27-23](https://user-images.githubusercontent.com/3216894/47199154-91acea00-d346-11e8-9ac1-eb7576ea1016.png)
+
 ## Contributing
 
-<TODO>
+Open an Issue or PR. =]
 
