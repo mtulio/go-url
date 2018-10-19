@@ -110,7 +110,9 @@ func urlTestLauncher() {
 	for x := 0; x < lenUrls; x++ {
 		r := <-config.ChanResp
 		fmt.Println(r.Message)
-		sendMetrics(r.Metrics)
+		if config.OptMetric {
+			sendMetrics(r.Metrics)
+		}
 	}
 
 	/* Wait for all goroutines in a workgroup */

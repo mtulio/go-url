@@ -14,6 +14,7 @@ func init() {
 	optConfig := flag.String("config", "", "Config filename. Eg.: -default=hack/config.json")
 	optURL := flag.String("url", "", "URL to test.")
 	optDNS := flag.Bool("dns", false, "Force resolve DNS and test each endpoint.")
+	optMetric := flag.String("metric", "", "Report metrics to pushgateway endpoint.")
 	flag.Usage = usage
 	flag.Parse()
 
@@ -40,6 +41,11 @@ func init() {
 	// extra options
 	if optDNS != nil {
 		config.OptForceDNS = *optDNS
+	}
+
+	if *optMetric != "" {
+		config.OptMetric = true
+		config.MetricPush = *optMetric
 	}
 }
 

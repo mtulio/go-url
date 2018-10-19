@@ -15,6 +15,7 @@ type GlobalConfig struct {
 	OptConfFile string
 	OptURL      string
 	OptEmpty    bool
+	OptMetric   bool
 }
 
 // URLTest is a test definition
