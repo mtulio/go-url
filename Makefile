@@ -10,7 +10,7 @@ build:
 	go build -o bin/go-url *.go
 
 run-sample:
-	go run *.go -dns -url=http://www.google.com
+	go run *.go -dns -url='https://www.google.com/search?source=hp&q=google'
 
 clean:
 	$(call deps_clean)

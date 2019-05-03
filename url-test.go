@@ -88,6 +88,9 @@ func urlValidate(u *URLTest) {
 		} else {
 			u.Path = parsedURL.Path
 		}
+		if parsedURL.RawQuery != "" {
+			u.Path += "?" + parsedURL.RawQuery
+		}
 	}
 }
 
