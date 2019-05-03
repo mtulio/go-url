@@ -205,7 +205,12 @@ func urlTestStart(u *URLTest, r *URLTestResult) {
 	httpTr := &http.Transport{}
 	timeout := time.Duration((time.Duration)(u.Timeout) * time.Second)
 	if u.TrSSLSkip == "yes" {
-		httpTr.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+		httpTr.TLSClientConfig = &tls.Config{
+			InsecureSkipVerify: true,
+		}
+		if u.Host != "" {
+			httpTr.TLSClientConfig.ServerName = u.Host
+		}
 	}
 	if u.TrIpv6 == "yes" {
 		httpTr.Dial = (&net.Dialer{DualStack: true}).Dial
