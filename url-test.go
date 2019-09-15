@@ -199,7 +199,7 @@ func urlTestSetup(u *URLTest) {
 	config.ChanResp <- testResp
 }
 
-func urlTestStart(u *URLTest, r *URLTestResult) {
+func getHTTPClient(u *URLTest) (*http.Client, error) {
 
 	// Setup transport Layer
 	httpTr := &http.Transport{}
@@ -215,9 +215,18 @@ func urlTestStart(u *URLTest, r *URLTestResult) {
 	if u.TrIpv6 == "yes" {
 		httpTr.Dial = (&net.Dialer{DualStack: true}).Dial
 	}
-	client := http.Client{
+	client := &http.Client{
 		Timeout:   timeout,
 		Transport: httpTr,
+	}
+	return client, nil
+}
+
+func urlTestStart(u *URLTest, r *URLTestResult) {
+
+	hclient, err := getHTTPClient(u)
+	if err != nil {
+		fmt.Println("Unable to create HTTP Client")
 	}
 
 	// Setup HTTP request
@@ -231,7 +240,7 @@ func urlTestStart(u *URLTest, r *URLTestResult) {
 
 	var metric Metric
 	timeStart := time.Now()
-	resp, err := client.Do(req)
+	resp, err := hclient.Do(req)
 	timeTaken := time.Since(timeStart)
 
 	if err != nil {
