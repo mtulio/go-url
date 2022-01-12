@@ -6,14 +6,16 @@
 
 APP_NAME ?= go-url
 
-DOCKER_REPO 		?= mtulio
-DOCKER_IMAGE_NAME 	= $(APP_NAME)
-DOCKER_IMAGE_TAG 	?= $(subst /,-,$(shell git rev-parse --abbrev-ref HEAD))
+CONTAINER_REPO			?= mtulio
+CONTAINER_IMAGE_NAME	?= $(APP_NAME)
+CONTAINER_IMAGE_TAG		?= $(subst /,-,$(shell git rev-parse --abbrev-ref HEAD))
+
+CONTAINER_ENGINE ?= podman
 
 CPWD := $(PWD)
 
-GORELEASE_VERSION 	:= v0.86.1
-GORELEASE_BASE_URL 	:= https://github.com/goreleaser/goreleaser/releases/download/$(GORELEASE_VERSION)/goreleaser
+GORELEASE_VERSION	:= v0.86.1
+GORELEASE_BASE_URL	:= https://github.com/goreleaser/goreleaser/releases/download/$(GORELEASE_VERSION)/goreleaser
 GORELEASE_URL_RPM 	:= $(GORELEASE_BASE_URL)_amd64.rpm
 
 # ##################

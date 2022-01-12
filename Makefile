@@ -47,26 +47,26 @@ release:
 # ######
 # Docker
 
-.PHONY: docker-run-sample
-docker-run-sample:
-	docker run -i \
-		-v $(PWD)/hack/config-sample.json:/config-sample.json \
-		"$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)" \
+.PHONY: container-run-sample
+container-run-sample:
+	$(CONTAINER_ENGINE) run -i \
+		-v $(PWD)/hack/config-sample.json:/config-sample.json:Z \
+		"$(CONTAINER_REPO)/$(CONTAINER_IMAGE_NAME):$(CONTAINER_IMAGE_TAG)" \
 		-dns -config /config-sample.json
 
-.PHONY: docker-build
-docker-build:
-	docker build -t "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)" .
+.PHONY: container-build
+container-build:
+	$(CONTAINER_ENGINE) build -t "$(CONTAINER_REPO)/$(CONTAINER_IMAGE_NAME):$(CONTAINER_IMAGE_TAG)" .
 
-.PHONY: docker-push
-docker-push:
-	docker push "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME)"
+.PHONY: container-push
+container-push:
+	$(CONTAINER_ENGINE) push "$(CONTAINER_REPO)/$(CONTAINER_IMAGE_NAME)"
 
-.PHONY: docker-tag-latest
-docker-tag-latest:
-	docker tag \
-		"$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)"
-		"$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):latest"
+.PHONY: container-tag-latest
+container-tag-latest:
+	$(CONTAINER_ENGINE) tag \
+		"$(CONTAINER_REPO)/$(CONTAINER_IMAGE_NAME):$(CONTAINER_IMAGE_TAG)"
+		"$(CONTAINER_REPO)/$(CONTAINER_IMAGE_NAME):latest"
 
 # ####
 # Test
