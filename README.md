@@ -48,6 +48,25 @@ Read url from option `-url`
 
 ***[sample stdout](./samples-stdout.md#Option--url)***
 
+### `-header`
+
+Supporting header option
+
+```bash
+go-url -dns -watch-period 20 -watch-interval 2 -header "user-agent=eu" https://www.google.com
+```
+
+or more advanced in config (url item):
+
+```json
+    {
+      "url": "https://www.google.com/",
+      "headers": {
+        "user-agent": "gurl"
+      }
+    },
+```
+
 ### `-watch-*`
 
 Add a option to watch requests (repeat requests):

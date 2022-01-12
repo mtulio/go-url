@@ -16,6 +16,7 @@ type GlobalConfig struct {
 	OptURL        string
 	OptEmpty      bool
 	OptMetric     bool
+	OptHeader     map[string]string
 	WatchPeriod   int
 	WatchInterval int
 }
