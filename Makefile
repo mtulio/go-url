@@ -6,7 +6,6 @@ include Makefile-defines.mk
 # #####
 # Build
 build:
-	$(call deps_dirs)
 	go build -o bin/go-url *.go
 
 run-sample:

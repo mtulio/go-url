@@ -12,9 +12,6 @@ DOCKER_IMAGE_TAG 	?= $(subst /,-,$(shell git rev-parse --abbrev-ref HEAD))
 
 CPWD := $(PWD)
 
-TMP_DIRS := ./bin
-TMP_DIRS += ./dist
-
 GORELEASE_VERSION 	:= v0.86.1
 GORELEASE_BASE_URL 	:= https://github.com/goreleaser/goreleaser/releases/download/$(GORELEASE_VERSION)/goreleaser
 GORELEASE_URL_RPM 	:= $(GORELEASE_BASE_URL)_amd64.rpm
@@ -40,14 +37,3 @@ define deps_tag
 	fi
 endef
 
-# Ensure directories exists
-define deps_dirs
-	@mkdir -p $(TEMP_DIRS)
-endef
-
-# Ensure directories are removed
-define deps_clean
-	@for d in $(TEMP_DIRS); do \
-		rm -rvf $$d; \
-	done
-endef
