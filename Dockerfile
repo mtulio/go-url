@@ -1,16 +1,15 @@
-FROM golang:1.10
-WORKDIR /build
-ADD *.go ./
-RUN mkdir -p bin/
-RUN CGO_ENABLED=0 GOOS=linux \
-    go build -a -installsuffix cgo \
-    -o ./bin/go-url *.go
+FROM golang:1.17 as builder
+WORKDIR /go/src/app
+COPY . .
+
+RUN go get -d -v ./...
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ./bin/go-url ./cmd/go-url/
 
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
-WORKDIR /go
-COPY --from=0 /build/bin/go-url /go/go-url
-ADD hack/docker-entrypoint.sh /go/entrypoint.sh
-RUN chmod +x /go/entrypoint.sh
-ENTRYPOINT ["sh","/go/entrypoint.sh"]
+WORKDIR /app
+COPY --from=builder /go/src/app/bin/go-url /app/
+ADD hack/docker-entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+ENTRYPOINT ["sh","/app/entrypoint.sh"]
 CMD [ "-h" ]
