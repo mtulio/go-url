@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	netURL "net/url"
@@ -106,7 +107,7 @@ func urlTestLauncher() {
 		lenUrls := len(config.URLs)
 		config.WG.Add(lenUrls)
 
-		fmt.Printf("#> Found [%d] URLs to test, starting...\n", lenUrls)
+		log.Printf("#> Running for [%d] URLs...\n", lenUrls)
 		for k := range config.URLs {
 
 			go urlTestSetup(&config.URLs[k])
@@ -126,14 +127,14 @@ func urlTestLauncher() {
 		config.WG.Wait()
 
 		timeTotalTakenMs := int64(time.Since(timeTotalStart) / time.Millisecond)
-		fmt.Printf("Total time taken: %vms\n", timeTotalTakenMs)
+		fmt.Printf("Total time taken: %vms\n\n", timeTotalTakenMs)
 
 		if config.WatchPeriod != 0 {
 			// check if will run and report next cycle
 			if int((time.Since(startTime)/time.Second)+time.Duration(config.WatchInterval)) < config.WatchPeriod {
 				fmt.Printf("Watcher waiting %ds, of period %ds\n", config.WatchInterval, config.WatchPeriod)
-				time.Sleep(time.Duration(config.WatchInterval) * time.Second)
 			}
+			time.Sleep(time.Duration(config.WatchInterval) * time.Second)
 			run = !(int(time.Since(startTime)/time.Second) >= config.WatchPeriod)
 		} else {
 			run = false
