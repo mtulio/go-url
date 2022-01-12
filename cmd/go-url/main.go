@@ -15,6 +15,9 @@ func init() {
 	optURL := flag.String("url", "", "URL to test.")
 	optDNS := flag.Bool("dns", false, "Force resolve DNS and test each endpoint.")
 	optMetric := flag.String("metric", "", "Report metrics to pushgateway endpoint.")
+	optWPeriod := flag.Int("watch-period", 0, "Watch period in seconds. Default: 0 (Disabled)")
+	optWInterval := flag.Int("watch-interval", 5, "Interval in seconds to watch. Should be less than the period. Default: 5")
+
 	flag.Usage = usage
 	flag.Parse()
 
@@ -46,6 +49,11 @@ func init() {
 	if *optMetric != "" {
 		config.OptMetric = true
 		config.MetricPush = *optMetric
+	}
+
+	if *optWPeriod != 0 {
+		config.WatchPeriod = *optWPeriod
+		config.WatchInterval = *optWInterval
 	}
 }
 

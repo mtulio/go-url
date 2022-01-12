@@ -6,16 +6,18 @@ import (
 
 // GlobalConfig is a main list of tests to go
 type GlobalConfig struct {
-	URLs        []URLTest `json:"urls"`
-	Location    string    `json:"location"`
-	MetricPush  string    `json:"metric_push"`
-	ChanResp    chan URLTestResult
-	WG          sync.WaitGroup
-	OptForceDNS bool
-	OptConfFile string
-	OptURL      string
-	OptEmpty    bool
-	OptMetric   bool
+	URLs          []URLTest `json:"urls"`
+	Location      string    `json:"location"`
+	MetricPush    string    `json:"metric_push"`
+	ChanResp      chan URLTestResult
+	WG            sync.WaitGroup
+	OptForceDNS   bool
+	OptConfFile   string
+	OptURL        string
+	OptEmpty      bool
+	OptMetric     bool
+	WatchPeriod   int
+	WatchInterval int
 }
 
 // URLTest is a test definition
