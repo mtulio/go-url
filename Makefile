@@ -6,10 +6,10 @@ include Makefile-defines.mk
 # #####
 # Build
 build:
-	go build -o bin/go-url *.go
+	go build -o bin/go-url cmd/go-url/*.go
 
 run-sample:
-	go run *.go -dns -url='https://www.google.com/search?source=hp&q=google'
+	go run cmd/go-url/*.go -dns -url='https://www.google.com/search?source=hp&q=google'
 
 clean:
 	$(call deps_clean)

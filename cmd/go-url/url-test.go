@@ -96,34 +96,49 @@ func urlValidate(u *URLTest) {
 
 /* Setup URLs from config and call the start func */
 func urlTestLauncher() {
+	startTime := time.Now()
+	run := true
+	for run {
 
-	timeTotalStart := time.Now()
+		timeTotalStart := time.Now()
 
-	config.ChanResp = make(chan URLTestResult)
-	lenUrls := len(config.URLs)
-	config.WG.Add(lenUrls)
+		config.ChanResp = make(chan URLTestResult)
+		lenUrls := len(config.URLs)
+		config.WG.Add(lenUrls)
 
-	fmt.Printf("#> Found [%d] URLs to test, starting...\n", lenUrls)
-	for k := range config.URLs {
+		fmt.Printf("#> Found [%d] URLs to test, starting...\n", lenUrls)
+		for k := range config.URLs {
 
-		go urlTestSetup(&config.URLs[k])
+			go urlTestSetup(&config.URLs[k])
 
-	}
+		}
 
-	/* Show all answers from the channel */
-	for x := 0; x < lenUrls; x++ {
-		r := <-config.ChanResp
-		fmt.Println(r.Message)
-		if config.OptMetric {
-			sendMetrics(r.Metrics)
+		/* Show all answers from the channel */
+		for x := 0; x < lenUrls; x++ {
+			r := <-config.ChanResp
+			fmt.Println(r.Message)
+			if config.OptMetric {
+				sendMetrics(r.Metrics)
+			}
+		}
+
+		/* Wait for all goroutines in a workgroup */
+		config.WG.Wait()
+
+		timeTotalTakenMs := int64(time.Since(timeTotalStart) / time.Millisecond)
+		fmt.Printf("Total time taken: %vms\n", timeTotalTakenMs)
+
+		if config.WatchPeriod != 0 {
+			// check if will run and report next cycle
+			if int((time.Since(startTime)/time.Second)+time.Duration(config.WatchInterval)) < config.WatchPeriod {
+				fmt.Printf("Watcher waiting %ds, of period %ds\n", config.WatchInterval, config.WatchPeriod)
+				time.Sleep(time.Duration(config.WatchInterval) * time.Second)
+			}
+			run = !(int(time.Since(startTime)/time.Second) >= config.WatchPeriod)
+		} else {
+			run = false
 		}
 	}
-
-	/* Wait for all goroutines in a workgroup */
-	config.WG.Wait()
-
-	timeTotalTakenMs := int64(time.Since(timeTotalStart) / time.Millisecond)
-	fmt.Printf("Total time taken: %vms\n", timeTotalTakenMs)
 }
 
 /* GOroutines to execute the URL check */

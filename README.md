@@ -48,6 +48,14 @@ Read url from option `-url`
 
 ***[sample stdout](./samples-stdout.md#Option--url)***
 
+### `-watch-*`
+
+Add a option to watch requests (repeat requests):
+
+```bash
+go-url -dns -watch-period 20 -watch-interval 2 https://www.google.com
+```
+
 ### Argument
 
 Read url from argument (`argv[1]`)
