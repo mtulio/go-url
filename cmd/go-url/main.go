@@ -88,7 +88,6 @@ func main() {
 		fmt.Printf("#> Reading config from JSON file: %s\n", config.OptConfFile)
 		configParserFromFile()
 	} else {
-		fmt.Printf("#> Reading config from Param\n")
 		configParserFromParam()
 	}
 
