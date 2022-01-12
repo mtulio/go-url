@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 )
 
 /* Initialize */
@@ -17,6 +18,7 @@ func init() {
 	optMetric := flag.String("metric", "", "Report metrics to pushgateway endpoint.")
 	optWPeriod := flag.Int("watch-period", 0, "Watch period in seconds. Default: 0 (Disabled)")
 	optWInterval := flag.Int("watch-interval", 5, "Interval in seconds to watch. Should be less than the period. Default: 5")
+	optHeader := flag.String("header", "", "One K=V header to pass to requests. More headers is supported when using config.")
 
 	flag.Usage = usage
 	flag.Parse()
@@ -54,6 +56,16 @@ func init() {
 	if *optWPeriod != 0 {
 		config.WatchPeriod = *optWPeriod
 		config.WatchInterval = *optWInterval
+	}
+
+	config.OptHeader = make(map[string]string)
+	if *optHeader != "" {
+		arr := strings.Split(*optHeader, "=")
+		if len(arr) != 2 {
+			fmt.Printf("Ignoring header [%s], it's not in the format k=v\n", *optHeader)
+		} else {
+			config.OptHeader[arr[0]] = arr[1]
+		}
 	}
 }
 

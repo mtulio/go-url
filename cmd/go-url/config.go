@@ -31,6 +31,7 @@ func configParserFromFile() {
 func configParserFromParam() {
 	var u URLTest
 	u.URL = config.OptURL
+	u.Headers = config.OptHeader
 	config.URLs = append(config.URLs, u)
 	assertConfig()
 }

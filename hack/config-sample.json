@@ -11,10 +11,16 @@
       "server": "ifconfig.co",
       "port": 80,
       "path": "/json",
-      "timeout": 5
+      "timeout": 5,
+      "headers": {
+        "user-agent": "gurl"
+      }
     },
     {
-      "url": "https://www.google.com/"
+      "url": "https://www.google.com/",
+      "headers": {
+        "user-agent": "gurl"
+      }
     },
     {
       "url": "http://www.google.com/"

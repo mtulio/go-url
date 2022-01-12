@@ -16,23 +16,25 @@ type GlobalConfig struct {
 	OptURL        string
 	OptEmpty      bool
 	OptMetric     bool
+	OptHeader     map[string]string
 	WatchPeriod   int
 	WatchInterval int
 }
 
 // URLTest is a test definition
 type URLTest struct {
-	URL       string `json:"url"`
-	Proto     string `json:"proto"`
-	Server    string `json:"server"`
-	Host      string `json:"host"`
-	Port      int    `json:"port"`
-	Path      string `json:"path"`
-	Timeout   int    `json:"timeout"`
-	Method    string `json:"method"`
-	Gzip      string `json:"gzip"`
-	TrSSLSkip string `json:"ssl_skip"`
-	TrIpv6    string `json:"ipv6"`
+	URL       string            `json:"url"`
+	Proto     string            `json:"proto"`
+	Server    string            `json:"server"`
+	Host      string            `json:"host"`
+	Port      int               `json:"port"`
+	Path      string            `json:"path"`
+	Timeout   int               `json:"timeout"`
+	Method    string            `json:"method"`
+	Gzip      string            `json:"gzip"`
+	TrSSLSkip string            `json:"ssl_skip"`
+	TrIpv6    string            `json:"ipv6"`
+	Headers   map[string]string `json:"headers"`
 }
 
 // URLTestGroup is a group of URLTest used when
