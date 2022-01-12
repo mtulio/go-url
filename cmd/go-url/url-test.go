@@ -252,6 +252,11 @@ func urlTestStart(u *URLTest, r *URLTestResult) {
 	if u.Gzip == "yes" {
 		req.Header.Add("Content-type", "application/gzip")
 	}
+	if len(u.Headers) != 0 {
+		for k, v := range u.Headers {
+			req.Header.Add(k, v)
+		}
+	}
 
 	var metric Metric
 	timeStart := time.Now()
